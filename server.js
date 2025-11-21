@@ -12,6 +12,7 @@ const multer = require('multer');
 const { PDFParse } = require('pdf-parse');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 
 // MongoDB connection
 const connectDB = require('./config/database');
@@ -122,7 +123,27 @@ async function embedText(text) {
   }
 }
 
-app.get('/health', (req, res) => res.json({ ok: true }));
+app.get('/health', async (req, res) => {
+  const health = { ok: true, services: {} };
+
+  // Test MongoDB
+  try {
+    health.services.mongodb = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  } catch (e) {
+    health.services.mongodb = 'error';
+  }
+
+  // Test ChromaDB
+  try {
+    await chroma.heartbeat();
+    health.services.chromadb = 'connected';
+  } catch (e) {
+    health.services.chromadb = `error: ${e.message}`;
+    health.ok = false;
+  }
+
+  res.json(health);
+});
 
 // Get all conversations for a user
 app.get('/conversations/:userId', async (req, res) => {
