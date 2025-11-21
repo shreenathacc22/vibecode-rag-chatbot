@@ -6,13 +6,8 @@ EXPOSE 8000
 # Set environment variables
 ENV CHROMA_HOST=0.0.0.0
 ENV CHROMA_PORT=8000
-ENV ALLOW_RESET=TRUE
 ENV IS_PERSISTENT=TRUE
 ENV ANONYMIZED_TELEMETRY=FALSE
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
-  CMD curl -f http://localhost:8000/api/v1/heartbeat || exit 1
-
-# Start ChromaDB
-CMD ["uvicorn", "chromadb.app:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"]
+# ChromaDB official image already has the correct CMD
+# No need to override it - let the image use its default startup command
