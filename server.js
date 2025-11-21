@@ -36,9 +36,19 @@ try {
 // Vector DB integration (ChromaDB) - Using HTTP API directly
 const CHROMA_HOST = process.env.CHROMA_HOST || 'localhost';
 const CHROMA_PORT = parseInt(process.env.CHROMA_PORT || '8000', 10);
-const CHROMA_URL = process.env.NODE_ENV === 'production'
-  ? `https://${CHROMA_HOST}/api/v2`
-  : `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v2`;
+
+// Construct ChromaDB URL based on environment
+let CHROMA_URL;
+if (process.env.NODE_ENV === 'production') {
+  // In production, if CHROMA_HOST doesn't include a protocol, add https://
+  if (CHROMA_HOST.startsWith('http://') || CHROMA_HOST.startsWith('https://')) {
+    CHROMA_URL = `${CHROMA_HOST}/api/v2`;
+  } else {
+    CHROMA_URL = `https://${CHROMA_HOST}.onrender.com/api/v2`;
+  }
+} else {
+  CHROMA_URL = `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v2`;
+}
 
 console.log(`ChromaDB URL: ${CHROMA_URL}`);
 
