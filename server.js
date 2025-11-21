@@ -33,15 +33,69 @@ try {
   console.log('Supabase not configured, using local storage');
 }
 
-// Vector DB integration (ChromaDB)
-const { ChromaClient } = require('chromadb');
+// Vector DB integration (ChromaDB) - Using HTTP API directly
 const CHROMA_HOST = process.env.CHROMA_HOST || 'localhost';
 const CHROMA_PORT = parseInt(process.env.CHROMA_PORT || '8000', 10);
-const chroma = new ChromaClient({
-  path: process.env.NODE_ENV === 'production'
-    ? `https://${CHROMA_HOST}`
-    : `http://${CHROMA_HOST}:${CHROMA_PORT}`
-});
+const CHROMA_URL = process.env.NODE_ENV === 'production'
+  ? `https://${CHROMA_HOST}/api/v2`
+  : `http://${CHROMA_HOST}:${CHROMA_PORT}/api/v2`;
+
+console.log(`ChromaDB URL: ${CHROMA_URL}`);
+
+// ChromaDB HTTP API wrapper
+const chroma = {
+  async heartbeat() {
+    const response = await axios.get(`${CHROMA_URL}/heartbeat`);
+    return response.data;
+  },
+  async deleteCollection({ name }) {
+    try {
+      await axios.delete(`${CHROMA_URL}/collections/${name}`);
+    } catch (error) {
+      if (error.response?.status !== 404) throw error;
+    }
+  },
+  async createCollection({ name }) {
+    const response = await axios.post(`${CHROMA_URL}/collections`, {
+      name,
+      metadata: {}
+    });
+    const collectionId = response.data.id;
+    return {
+      id: collectionId,
+      name,
+      async add({ ids, documents, embeddings }) {
+        await axios.post(`${CHROMA_URL}/collections/${collectionId}/add`, {
+          ids,
+          documents,
+          embeddings
+        });
+      },
+      async query({ queryEmbeddings, nResults }) {
+        const response = await axios.post(`${CHROMA_URL}/collections/${collectionId}/query`, {
+          query_embeddings: queryEmbeddings,
+          n_results: nResults
+        });
+        return response.data;
+      }
+    };
+  },
+  async getCollection({ name }) {
+    const response = await axios.get(`${CHROMA_URL}/collections/${name}`);
+    const collectionId = response.data.id;
+    return {
+      id: collectionId,
+      name,
+      async query({ queryEmbeddings, nResults }) {
+        const response = await axios.post(`${CHROMA_URL}/collections/${collectionId}/query`, {
+          query_embeddings: queryEmbeddings,
+          n_results: nResults
+        });
+        return response.data;
+      }
+    };
+  }
+};
 
 // Helper: Get collection name for a conversation
 function getCollectionName(convoId) {
