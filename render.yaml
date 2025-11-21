@@ -22,7 +22,7 @@ services:
       - key: ALLOWED_ORIGINS
         sync: false
       - key: CHROMA_HOST
-        value: vibecode-rag-chatbot-chromadb
+        value: https://vibecode-rag-chatbot-chromadb.onrender.com
       - key: CHROMA_PORT
         value: 8000
       - key: USE_SUPABASE_STORAGE
