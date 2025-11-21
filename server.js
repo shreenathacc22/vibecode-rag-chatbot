@@ -34,7 +34,13 @@ try {
 
 // Vector DB integration (ChromaDB)
 const { ChromaClient } = require('chromadb');
-const chroma = new ChromaClient({ host: 'localhost', port: 8000 });
+const CHROMA_HOST = process.env.CHROMA_HOST || 'localhost';
+const CHROMA_PORT = parseInt(process.env.CHROMA_PORT || '8000', 10);
+const chroma = new ChromaClient({
+  path: process.env.NODE_ENV === 'production'
+    ? `https://${CHROMA_HOST}`
+    : `http://${CHROMA_HOST}:${CHROMA_PORT}`
+});
 
 // Helper: Get collection name for a conversation
 function getCollectionName(convoId) {
