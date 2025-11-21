@@ -1,7 +1,7 @@
 services:
   # Main Chatbot Application
   - type: web
-    name: chatbot-app
+    name: vibecode-rag-chatbot
     env: node
     region: oregon
     plan: free
@@ -22,7 +22,7 @@ services:
       - key: ALLOWED_ORIGINS
         sync: false
       - key: CHROMA_HOST
-        value: chatbot-chromadb
+        value: vibecode-rag-chatbot-chromadb
       - key: CHROMA_PORT
         value: 8000
       - key: USE_SUPABASE_STORAGE
@@ -36,7 +36,7 @@ services:
 
   # ChromaDB Service
   - type: web
-    name: chatbot-chromadb
+    name: vibecode-rag-chatbot-chromadb
     env: docker
     region: oregon
     plan: free
