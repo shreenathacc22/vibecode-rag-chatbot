@@ -8,6 +8,7 @@ ENV CHROMA_HOST=0.0.0.0
 ENV CHROMA_PORT=8000
 ENV IS_PERSISTENT=TRUE
 ENV ANONYMIZED_TELEMETRY=FALSE
+ENV CHROMA_SERVER_CORS_ALLOW_ORIGINS=["*"]
 
 # ChromaDB official image already has the correct CMD
 # No need to override it - let the image use its default startup command

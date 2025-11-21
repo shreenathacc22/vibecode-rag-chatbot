@@ -41,9 +41,11 @@ services:
     region: oregon
     plan: free
     dockerfilePath: ./Dockerfile.chromadb
-    healthCheckPath: /api/v1/heartbeat
+    healthCheckPath: /api/v2/heartbeat
     envVars:
       - key: CHROMA_HOST
         value: 0.0.0.0
       - key: CHROMA_PORT
         value: 8000
+      - key: CHROMA_SERVER_CORS_ALLOW_ORIGINS
+        value: '["*"]'
