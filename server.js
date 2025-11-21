@@ -45,12 +45,12 @@ console.log(`ChromaDB URL: ${CHROMA_URL}`);
 // ChromaDB HTTP API wrapper
 const chroma = {
   async heartbeat() {
-    const response = await axios.get(`${CHROMA_URL}/heartbeat`);
+    const response = await axios.get(`${CHROMA_URL}/heartbeat`, { timeout: 5000 });
     return response.data;
   },
   async deleteCollection({ name }) {
     try {
-      await axios.delete(`${CHROMA_URL}/collections/${name}`);
+      await axios.delete(`${CHROMA_URL}/collections/${name}`, { timeout: 10000 });
     } catch (error) {
       if (error.response?.status !== 404) throw error;
     }
@@ -59,7 +59,7 @@ const chroma = {
     const response = await axios.post(`${CHROMA_URL}/collections`, {
       name,
       metadata: {}
-    });
+    }, { timeout: 10000 });
     const collectionId = response.data.id;
     return {
       id: collectionId,
@@ -69,19 +69,19 @@ const chroma = {
           ids,
           documents,
           embeddings
-        });
+        }, { timeout: 30000 });
       },
       async query({ queryEmbeddings, nResults }) {
         const response = await axios.post(`${CHROMA_URL}/collections/${collectionId}/query`, {
           query_embeddings: queryEmbeddings,
           n_results: nResults
-        });
+        }, { timeout: 30000 });
         return response.data;
       }
     };
   },
   async getCollection({ name }) {
-    const response = await axios.get(`${CHROMA_URL}/collections/${name}`);
+    const response = await axios.get(`${CHROMA_URL}/collections/${name}`, { timeout: 10000 });
     const collectionId = response.data.id;
     return {
       id: collectionId,
@@ -90,7 +90,7 @@ const chroma = {
         const response = await axios.post(`${CHROMA_URL}/collections/${collectionId}/query`, {
           query_embeddings: queryEmbeddings,
           n_results: nResults
-        });
+        }, { timeout: 30000 });
         return response.data;
       }
     };
