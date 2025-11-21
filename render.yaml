@@ -43,9 +43,13 @@ services:
     dockerfilePath: ./Dockerfile.chromadb
     healthCheckPath: /api/v2/heartbeat
     envVars:
-      - key: CHROMA_HOST
+      - key: CHROMA_HOST_ADDR
         value: 0.0.0.0
-      - key: CHROMA_PORT
+      - key: CHROMA_HOST_PORT
         value: 8000
+      - key: IS_PERSISTENT
+        value: TRUE
+      - key: ANONYMIZED_TELEMETRY
+        value: FALSE
       - key: CHROMA_SERVER_CORS_ALLOW_ORIGINS
         value: '["*"]'
